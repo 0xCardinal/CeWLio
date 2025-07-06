@@ -17,27 +17,10 @@ Perfect for penetration testers, security researchers, and anyone needing high-q
 
 ---
 
-## 🔄 CeWL vs CeWLio: What's Different?
-
-| Feature | Original CeWL | CeWLio |
-|---------|---------------|---------|
-| **Language** | Ruby | Python 3.12+ |
-| **JavaScript Support** | ❌ Static HTML only | ✅ Full JavaScript rendering |
-| **Browser Engine** | Basic HTTP requests | 🚀 Playwright (Chromium/Firefox/WebKit) |
-| **Modern Web Support** | ❌ Struggles with SPAs | ✅ Handles React, Vue, Angular |
-| **Word Processing** | Basic filtering | 🎯 Advanced: length, case, umlauts, groups |
-| **Email Extraction** | Basic regex | 🔍 Smart: content + mailto links |
-| **API Access** | ❌ CLI only | ✅ Python API + CLI |
-| **Testing** | Limited | 🧪 100% test coverage |
-| **Installation** | Ruby gems | 📦 `pip install cewlio` |
-| **Cross-Platform** | Ruby dependencies | ✅ Universal Python package |
-| **Active Development** | ❌ Limited updates | ✅ Modern, actively maintained |
-
----
-
 ## 🚀 Features
 
-- **JavaScript-Aware Extraction:** Uses headless browser to render pages and extract content after JavaScript execution
+- **JavaScript-Aware Extraction:** Uses headless browser to render pages and extract content after JavaScript execution.
+- **Modern Web Support:** Handles Single Page Applications (SPAs), infinite scroll, lazy loading, and dynamic content that traditional scrapers miss.
 - **Advanced Word Processing:**
   - Minimum/maximum word length filtering
   - Lowercase conversion
@@ -61,7 +44,7 @@ pip install cewlio
 
 ### From Source
 ```bash
-git clone https://github.com/yourusername/cewlio
+git clone https://github.com/0xCardinal/cewlio
 cd cewlio
 pip install -e .
 ```
