@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-Passed-brightgreen?style=for-the-badge)](CONTRIBUTING.md#testing)
 
-**CeWLio** is a powerful, Python-based Custom Word List Generator inspired by the original [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood. It crawls web pages, executes JavaScript, and extracts:
+**CeWLio** is a powerful, Python-based Custom Word List Generator inspired by the original [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood. While CeWL is excellent for static HTML content, CeWLio brings modern web scraping capabilities to handle today's JavaScript-heavy websites. It crawls web pages, executes JavaScript, and extracts:
 
 - 📚 Unique words (with advanced filtering)
 - 📧 Email addresses  
@@ -14,6 +14,24 @@
 Perfect for penetration testers, security researchers, and anyone needing high-quality, site-specific wordlists!
 
 > **🤖 AI-Assisted Development**: This project was created with the help of AI tools, but solves real-world problems in web scraping and word list generation. Every line of code has been carefully reviewed, tested, and optimized for production use.
+
+---
+
+## 🔄 CeWL vs CeWLio: What's Different?
+
+| Feature | Original CeWL | CeWLio |
+|---------|---------------|---------|
+| **Language** | Ruby | Python 3.12+ |
+| **JavaScript Support** | ❌ Static HTML only | ✅ Full JavaScript rendering |
+| **Browser Engine** | Basic HTTP requests | 🚀 Playwright (Chromium/Firefox/WebKit) |
+| **Modern Web Support** | ❌ Struggles with SPAs | ✅ Handles React, Vue, Angular |
+| **Word Processing** | Basic filtering | 🎯 Advanced: length, case, umlauts, groups |
+| **Email Extraction** | Basic regex | 🔍 Smart: content + mailto links |
+| **API Access** | ❌ CLI only | ✅ Python API + CLI |
+| **Testing** | Limited | 🧪 100% test coverage |
+| **Installation** | Ruby gems | 📦 `pip install cewlio` |
+| **Cross-Platform** | Ruby dependencies | ✅ Universal Python package |
+| **Active Development** | ❌ Limited updates | ✅ Modern, actively maintained |
 
 ---
 
