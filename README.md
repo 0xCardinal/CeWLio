@@ -1,9 +1,9 @@
 # CeWLio 🕵️‍♂️✨
 
 [![AI-Assisted Development](https://img.shields.io/badge/AI--Assisted-Development-blue?style=for-the-badge&logo=openai&logoColor=white)](https://github.com/0xCardinal/cewlio)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-33%20passed-brightgreen?style=for-the-badge)](CONTRIBUTING.md#testing)
+[![Tests](https://img.shields.io/badge/Tests-Passed-brightgreen?style=for-the-badge)](CONTRIBUTING.md#testing)
 
 **CeWLio** is a powerful, Python-based Custom Word List Generator inspired by the original [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood. It crawls web pages, executes JavaScript, and extracts:
 
@@ -49,7 +49,7 @@ pip install -e .
 ```
 
 ### Dependencies
-- Python 3.8+
+- Python 3.12+
 - Playwright (for browser automation)
 - BeautifulSoup4 (for HTML parsing)
 - Requests (for HTTP handling)
