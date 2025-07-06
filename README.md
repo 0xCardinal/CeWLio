@@ -239,12 +239,6 @@ For detailed development setup and guidelines, see [CONTRIBUTING.md](CONTRIBUTIN
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Credits
 
 - Inspired by [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood
