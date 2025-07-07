@@ -136,6 +136,7 @@ python -m unittest tests.test_cewlio -v
 
 # Run specific test classes
 python -m unittest tests.test_cewlio.TestCeWLio -v
+python -m unittest tests.test_cewlio.TestCLIValidation -v
 python -m unittest tests.test_cewlio.TestEdgeCases -v
 
 # Run specific test methods
@@ -150,9 +151,10 @@ Our test suite is organized into several classes:
 - **TestExtractHTML**: HTML extraction tests (3 tests)
 - **TestProcessURLWithCeWLio**: URL processing tests (2 tests)
 - **TestIntegration**: Integration tests (3 tests)
+- **TestCLIValidation**: CLI argument validation tests (5 tests)
 - **TestEdgeCases**: Edge case tests (10 tests)
 
-**Total: 33 tests with 100% success rate**
+**Total: 38 tests with 100% success rate**
 
 ### Writing Tests
 

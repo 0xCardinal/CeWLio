@@ -191,15 +191,16 @@ asyncio.run(main())
 
 ## 🧪 Testing
 
-The project includes a comprehensive test suite with 33 tests covering all functionality:
+The project includes a comprehensive test suite with 38 tests covering all functionality:
 
 - ✅ Core functionality tests (15 tests)
 - ✅ HTML extraction tests (3 tests)  
 - ✅ URL processing tests (2 tests)
 - ✅ Integration tests (3 tests)
+- ✅ CLI argument validation tests (5 tests)
 - ✅ Edge case tests (10 tests)
 
-**Total: 33 tests with 100% success rate**
+**Total: 38 tests with 100% success rate**
 
 For detailed testing information and development setup, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
