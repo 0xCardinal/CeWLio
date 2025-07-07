@@ -12,6 +12,7 @@ from urllib.parse import urlparse, urljoin
 from collections import Counter
 import asyncio
 from .extractors import extract_html
+import sys
 
 
 class CeWLio:

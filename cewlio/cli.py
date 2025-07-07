@@ -8,8 +8,17 @@ import asyncio
 import sys
 from pathlib import Path
 from typing import Optional
+from importlib.metadata import version, PackageNotFoundError
 
 from .core import CeWLio, process_url_with_cewlio
+
+
+def get_version() -> str:
+    """Get version from package metadata."""
+    try:
+        return version("cewlio")
+    except PackageNotFoundError:
+        return "unknown"
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -25,6 +34,13 @@ Examples:
   cewlio https://example.com --min-length 4 --max-length 12
   cewlio https://example.com --groups 3 --count
         """
+    )
+    
+    # Version argument
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"CeWLio {get_version()}"
     )
     
     # URL argument
