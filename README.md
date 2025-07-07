@@ -262,36 +262,6 @@ For detailed development setup and guidelines, see [CONTRIBUTING.md](CONTRIBUTIN
 
 ---
 
-## 📝 Changelog
-
-### v1.1.2
-- 🎯 **CeWL Compatibility**: Updated CLI flags to match original CeWL tool
-- 🔇 **Silent by Default**: Removed debug output unless `--debug` flag is used
-- 📧 **Enhanced Email/Metadata Control**: Separate flags for stdout vs file output
-- 🔧 **Version Flag**: Added `--version` flag with dynamic version detection
-- 🧹 **Simplified CLI**: Removed redundant `-n` flag (use `-e`/`-a` for no words)
-- 📝 **Improved Documentation**: Updated README with new flags and examples
-
-### v1.1.1
-- 🐛 Fixed version detection and fallback mechanisms
-- 🔧 Improved error handling and debug output
-
-### v1.1.0
-- ✨ Added word groups functionality
-- 🔧 Enhanced CLI with better output control
-- 📧 Improved email and metadata extraction
-
-### v1.0.0
-- ✨ Initial release
-- 🎯 Complete word extraction with filtering
-- 📧 Email extraction from content and mailto links
-- 🏷️ Metadata extraction from HTML meta tags
-- 🔧 Professional CLI interface
-- 🧪 Comprehensive test suite (33 tests)
-- 📦 PyPI-ready packaging
-
----
-
 ## 🙏 Credits
 
 - Inspired by [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood
