@@ -12,7 +12,7 @@ try:
     from importlib.metadata import version
     __version__ = version("cewlio")
 except ImportError:
-    __version__ = "1.1.1"
+    __version__ = "latest"
 
 __author__ = "Kumar Ashwin"
 

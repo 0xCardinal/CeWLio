@@ -11,11 +11,11 @@ from pathlib import Path
 
 # Available test classes
 TEST_CLASSES = {
-    "cewlio": "Core CeWLio functionality tests",
-    "extract_html": "HTML extraction tests", 
-    "process_url": "URL processing tests",
-    "integration": "Integration tests",
-    "edge_cases": "Edge case tests"
+    "TestCeWLio": "Core CeWLio functionality tests",
+    "TestExtractHTML": "HTML extraction tests", 
+    "TestProcessURLWithCeWLio": "URL processing tests",
+    "TestIntegration": "Integration tests",
+    "TestEdgeCases": "Edge case tests"
 }
 
 def run_test_class(test_class):
@@ -24,9 +24,15 @@ def run_test_class(test_class):
     print("=" * 60)
     
     try:
-        result = subprocess.run([sys.executable, "run_tests.py", "--class", test_class], 
-                              capture_output=False, 
-                              timeout=300)
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Run the specific test class using unittest from the tests directory
+        result = subprocess.run([
+            sys.executable, "-m", "unittest", 
+            f"test_cewlio.{test_class}", 
+            "-v"
+        ], capture_output=False, timeout=300, cwd=script_dir)
         return result.returncode == 0
     except subprocess.TimeoutExpired:
         print(f"❌ Test timed out: {test_class}")

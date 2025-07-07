@@ -30,7 +30,8 @@ Perfect for penetration testers, security researchers, and anyone needing high-q
 - **Word Grouping:** Generate multi-word phrases (e.g., 2-grams, 3-grams)
 - **Email & Metadata Extraction:** Find emails from content and mailto links, extract meta tags
 - **Flexible Output:** Save words, emails, and metadata to separate files or stdout
-- **Professional CLI:** All features accessible via command-line interface
+- **Professional CLI:** All features accessible via command-line interface with CeWL-compatible flags
+- **Silent Operation:** Runs quietly by default, with optional debug output
 - **Comprehensive Testing:** 100% test coverage
 
 ---
@@ -61,26 +62,32 @@ pip install -e .
 
 ### Basic Usage
 ```bash
-# Extract words from a website
+# Extract words from a website (silent by default)
 cewlio https://example.com
 
 # Save words to a file
-cewlio https://example.com -o wordlist.txt
+cewlio https://example.com --output wordlist.txt
 
-# Extract emails and metadata
-cewlio https://example.com --email emails.txt --metadata meta.txt
+# Include emails in stdout output
+cewlio https://example.com -e
+
+# Include metadata in stdout output
+cewlio https://example.com -a
+
+# Save emails and metadata to files
+cewlio https://example.com --email_file emails.txt --meta_file meta.txt
 ```
 
 ### Advanced Examples
 
 **Generate word groups with counts:**
 ```bash
-cewlio https://example.com --groups 3 --count -o phrases.txt
+cewlio https://example.com --groups 3 -c --output phrases.txt
 ```
 
 **Custom word filtering:**
 ```bash
-cewlio https://example.com --min-length 4 --max-length 12 --lowercase --convert-umlauts
+cewlio https://example.com -m 4 --max-length 12 --lowercase --convert-umlauts
 ```
 
 **Handle JavaScript-heavy sites:**
@@ -88,9 +95,34 @@ cewlio https://example.com --min-length 4 --max-length 12 --lowercase --convert-
 cewlio https://example.com -w 5 --visible
 ```
 
-**Extract only emails and metadata:**
+**Extract only emails and metadata (no words):**
 ```bash
-cewlio https://example.com --no-words --email emails.txt --metadata meta.txt
+cewlio https://example.com -e -a
+```
+
+**Extract only emails (no words):**
+```bash
+cewlio https://example.com -e
+```
+
+**Extract only metadata (no words):**
+```bash
+cewlio https://example.com -a
+```
+
+**Save emails to file (no words to stdout):**
+```bash
+cewlio https://example.com --email_file emails.txt
+```
+
+**Show debug information:**
+```bash
+cewlio https://example.com --debug
+```
+
+**Show version:**
+```bash
+cewlio --version
 ```
 
 ---
@@ -100,20 +132,24 @@ cewlio https://example.com --no-words --email emails.txt --metadata meta.txt
 | Option | Description | Default |
 |--------|-------------|---------|
 | `url` | URL to process | Required |
-| `-o, --output` | Output file for words | stdout |
-| `--email` | Output file for email addresses | - |
-| `--metadata` | Output file for metadata | - |
-| `--min-length` | Minimum word length | 3 |
+| `--version` | Show version and exit | - |
+| `--output` | Output file for words | stdout |
+| `-e, --email` | Include email addresses in stdout output | False |
+| `--email_file` | Output file for email addresses | - |
+| `-a, --meta` | Include metadata in stdout output | False |
+| `--meta_file` | Output file for metadata | - |
+| `-m, --min_word_length` | Minimum word length | 3 |
 | `--max-length` | Maximum word length | No limit |
 | `--lowercase` | Convert words to lowercase | False |
 | `--with-numbers` | Include words with numbers | False |
 | `--convert-umlauts` | Convert umlaut characters | False |
-| `--count` | Show word counts | False |
+| `-c, --count` | Show word counts | False |
 | `--groups` | Generate word groups of specified size | - |
 | `-w, --wait` | Wait time for JavaScript execution (seconds) | 0 |
 | `--visible` | Show browser window | False |
 | `--timeout` | Browser timeout (milliseconds) | 30000 |
-| `--no-words` | Don't extract words (only emails/metadata) | False |
+
+| `--debug` | Show debug/summary output | False |
 
 ---
 
@@ -227,6 +263,23 @@ For detailed development setup and guidelines, see [CONTRIBUTING.md](CONTRIBUTIN
 ---
 
 ## 📝 Changelog
+
+### v1.1.2
+- 🎯 **CeWL Compatibility**: Updated CLI flags to match original CeWL tool
+- 🔇 **Silent by Default**: Removed debug output unless `--debug` flag is used
+- 📧 **Enhanced Email/Metadata Control**: Separate flags for stdout vs file output
+- 🔧 **Version Flag**: Added `--version` flag with dynamic version detection
+- 🧹 **Simplified CLI**: Removed redundant `-n` flag (use `-e`/`-a` for no words)
+- 📝 **Improved Documentation**: Updated README with new flags and examples
+
+### v1.1.1
+- 🐛 Fixed version detection and fallback mechanisms
+- 🔧 Improved error handling and debug output
+
+### v1.1.0
+- ✨ Added word groups functionality
+- 🔧 Enhanced CLI with better output control
+- 📧 Improved email and metadata extraction
 
 ### v1.0.0
 - ✨ Initial release

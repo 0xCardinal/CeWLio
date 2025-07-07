@@ -160,12 +160,16 @@ class CeWLio:
         # Process words
         self.process_words(clean_text, group_size)
 
-    def save_results(self, output_file=None, email_file=None, metadata_file=None):
+    def save_results(self, output_file=None, email_file=None, metadata_file=None, 
+                    show_emails=False, show_metadata=False):
         """Save results to files or print to console."""
         output = output_file if output_file else sys.stdout
         
-        # Save words
-        if self.words:
+        # Determine what to print to stdout (or output file)
+        print_words = not (show_emails or show_metadata)  # Only print words if no -e/-a flags
+        
+        # Save words (if no -e/-a flags are set)
+        if self.words and print_words:
             sorted_words = sorted(self.words.items(), key=lambda x: (-x[1], x[0]))
             for word, count in sorted_words:
                 if self.show_count:
@@ -173,8 +177,8 @@ class CeWLio:
                 else:
                     print(word, file=output)
         
-        # Save word groups
-        if self.word_groups:
+        # Save word groups (if no -e/-a flags are set)
+        if self.word_groups and print_words:
             sorted_groups = sorted(self.word_groups.items(), key=lambda x: (-x[1], x[0]))
             for group, count in sorted_groups:
                 if self.show_count:
@@ -182,27 +186,35 @@ class CeWLio:
                 else:
                     print(group, file=output)
         
-        # Save emails
+        # Save emails (to stdout if -e flag, or to email_file if specified)
         if self.emails:
-            email_output = email_file if email_file else output
-            sorted_emails = sorted(self.emails)
-            for email in sorted_emails:
-                print(email, file=email_output)
+            if email_file:
+                sorted_emails = sorted(self.emails)
+                for email in sorted_emails:
+                    print(email, file=email_file)
+            elif show_emails:
+                sorted_emails = sorted(self.emails)
+                for email in sorted_emails:
+                    print(email, file=output)
         
-        # Save metadata
+        # Save metadata (to stdout if -a flag, or to metadata_file if specified)
         if self.metadata:
-            metadata_output = metadata_file if metadata_file else output
-            sorted_metadata = sorted(self.metadata)
-            for meta in sorted_metadata:
-                print(meta, file=metadata_output)
-        
+            if metadata_file:
+                sorted_metadata = sorted(self.metadata)
+                for meta in sorted_metadata:
+                    print(meta, file=metadata_file)
+            elif show_metadata:
+                sorted_metadata = sorted(self.metadata)
+                for meta in sorted_metadata:
+                    print(meta, file=output)
 
 
 async def process_url_with_cewlio(url, cewlio_instance, group_size=None, output_file=None, 
-                               email_file=None, metadata_file=None, wait_time=0, 
-                               headless=True, timeout=30000):
+                               email_file=None, metadata_file=None, show_emails=False, 
+                               show_metadata=False, wait_time=0, headless=True, timeout=30000, debug=False):
     """Extract HTML from URL and process it with CeWLio."""
-    print(f"Processing URL: {url}")
+    if debug:
+        print(f"Processing URL: {url}")
     
     # Extract HTML
     html_content = await extract_html(
@@ -210,18 +222,20 @@ async def process_url_with_cewlio(url, cewlio_instance, group_size=None, output_
         output_file=None,  # We don't want to save the HTML file
         wait_time=wait_time,
         headless=headless,
-        timeout=timeout
+        timeout=timeout,
+        debug=debug
     )
     
     if html_content is None:
-        print(f"Failed to extract HTML from {url}")
+        if debug:
+            print(f"Failed to extract HTML from {url}")
         return False
     
     # Process with CeWLio
     cewlio_instance.process_html(html_content, group_size)
     
     # Save results
-    cewlio_instance.save_results(output_file, email_file, metadata_file)
+    cewlio_instance.save_results(output_file, email_file, metadata_file, show_emails, show_metadata)
     
     return True
 

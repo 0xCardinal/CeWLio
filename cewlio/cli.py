@@ -18,7 +18,15 @@ def get_version() -> str:
     try:
         return version("cewlio")
     except PackageNotFoundError:
-        return "unknown"
+        # Fallback: read directly from pyproject.toml
+        try:
+            import tomllib
+            pyproject_path = Path(__file__).parent.parent.parent / "pyproject.toml"
+            with open(pyproject_path, "rb") as f:
+                data = tomllib.load(f)
+                return data["project"]["version"]
+        except (FileNotFoundError, KeyError, tomllib.TOMLDecodeError):
+            return "unknown"
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -29,10 +37,10 @@ def create_parser() -> argparse.ArgumentParser:
         epilog="""
 Examples:
   cewlio https://example.com
-  cewlio https://example.com -o words.txt
-  cewlio https://example.com -w 5 --email --metadata
-  cewlio https://example.com --min-length 4 --max-length 12
-  cewlio https://example.com --groups 3 --count
+  cewlio https://example.com --output words.txt
+  cewlio https://example.com -w 5 -e -a
+  cewlio https://example.com -m 4 --max-length 12
+  cewlio https://example.com --groups 3 -c
         """
     )
     
@@ -55,20 +63,30 @@ Examples:
         help="Output file for words (default: stdout)"
     )
     parser.add_argument(
-        "--email",
+        "-e", "--email",
+        action="store_true",
+        help="Include email addresses"
+    )
+    parser.add_argument(
+        "--email_file",
         help="Output file for email addresses"
     )
     parser.add_argument(
-        "--metadata",
-        help="Output file for metadata"
+        "-a", "--meta",
+        action="store_true",
+        help="Include meta data"
+    )
+    parser.add_argument(
+        "--meta_file",
+        help="Output file for meta data"
     )
     
     # Word processing options
     parser.add_argument(
-        "--min-length",
+        "-m", "--min_word_length",
         type=int,
         default=3,
-        help="Minimum word length (default: 3)"
+        help="Minimum word length, default 3"
     )
     parser.add_argument(
         "--max-length",
@@ -91,9 +109,9 @@ Examples:
         help="Convert umlaut characters (ä→ae, ö→oe, ü→ue, ß→ss)"
     )
     parser.add_argument(
-        "--count",
+        "-c", "--count",
         action="store_true",
-        help="Show word counts"
+        help="Show the count for each word found"
     )
     
     # Word groups
@@ -122,12 +140,13 @@ Examples:
         default=30000,
         help="Browser timeout in milliseconds (default: 30000)"
     )
+
     
-    # No words mode
+    # Debug/verbose flag
     parser.add_argument(
-        "--no-words",
+        "--debug",
         action="store_true",
-        help="Don't extract words, only emails and metadata"
+        help="Show debug/summary output"
     )
     
     return parser
@@ -140,7 +159,7 @@ def main() -> None:
     
     # Create CeWLio instance
     cewlio = CeWLio(
-        min_word_length=args.min_length,
+        min_word_length=args.min_word_length,
         max_word_length=args.max_length,
         lowercase=args.lowercase,
         with_numbers=args.with_numbers,
@@ -160,16 +179,16 @@ def main() -> None:
             print(f"Error opening output file: {e}", file=sys.stderr)
             sys.exit(1)
     
-    if args.email:
+    if args.email_file:
         try:
-            email_file = open(args.email, 'w', encoding='utf-8')
+            email_file = open(args.email_file, 'w', encoding='utf-8')
         except IOError as e:
             print(f"Error opening email file: {e}", file=sys.stderr)
             sys.exit(1)
     
-    if args.metadata:
+    if args.meta_file:
         try:
-            metadata_file = open(args.metadata, 'w', encoding='utf-8')
+            metadata_file = open(args.meta_file, 'w', encoding='utf-8')
         except IOError as e:
             print(f"Error opening metadata file: {e}", file=sys.stderr)
             sys.exit(1)
@@ -183,24 +202,27 @@ def main() -> None:
             output_file=output_file,
             email_file=email_file,
             metadata_file=metadata_file,
+            show_emails=args.email,
+            show_metadata=args.meta,
             wait_time=args.wait,
             headless=not args.visible,
-            timeout=args.timeout
+            timeout=args.timeout,
+            debug=args.debug
         ))
         
         if not success:
             sys.exit(1)
         
-        # Print summary
-        print(f"\nProcessing complete!", file=sys.stderr)
-        if not args.no_words:
+        # Print summary only if debug
+        if args.debug:
+            print(f"\nProcessing complete!", file=sys.stderr)
             print(f"Words found: {len(cewlio.words)}", file=sys.stderr)
-        if args.groups:
-            print(f"Word groups found: {len(cewlio.word_groups)}", file=sys.stderr)
-        if args.email or cewlio.emails:
-            print(f"Email addresses found: {len(cewlio.emails)}", file=sys.stderr)
-        if args.metadata or cewlio.metadata:
-            print(f"Metadata items found: {len(cewlio.metadata)}", file=sys.stderr)
+            if args.groups:
+                print(f"Word groups found: {len(cewlio.word_groups)}", file=sys.stderr)
+            if args.email or args.email_file or cewlio.emails:
+                print(f"Email addresses found: {len(cewlio.emails)}", file=sys.stderr)
+            if args.meta or args.meta_file or cewlio.metadata:
+                print(f"Metadata items found: {len(cewlio.metadata)}", file=sys.stderr)
     
     except KeyboardInterrupt:
         print("\nOperation cancelled by user", file=sys.stderr)

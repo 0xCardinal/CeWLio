@@ -11,7 +11,7 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 
 
-async def extract_html(url, output_file=None, wait_time=0, headless=True, timeout=30000):
+async def extract_html(url, output_file=None, wait_time=0, headless=True, timeout=30000, debug=False):
     """
     Extract HTML from a webpage after JavaScript execution.
     
@@ -28,7 +28,8 @@ async def extract_html(url, output_file=None, wait_time=0, headless=True, timeou
         page = await browser.new_page()
         
         try:
-            print(f"Loading page: {url}")
+            if debug:
+                print(f"Loading page: {url}")
             
             # Try different wait strategies in order of preference
             wait_strategies = [
@@ -42,44 +43,52 @@ async def extract_html(url, output_file=None, wait_time=0, headless=True, timeou
             
             for strategy in wait_strategies:
                 try:
-                    print(f"Trying wait strategy: {strategy}")
+                    if debug:
+                        print(f"Trying wait strategy: {strategy}")
                     await page.goto(url, wait_until=strategy, timeout=timeout)
                     
                     # Additional wait time if specified
                     if wait_time > 0:
-                        print(f"Waiting additional {wait_time} seconds...")
+                        if debug:
+                            print(f"Waiting additional {wait_time} seconds...")
                         await asyncio.sleep(wait_time)
                     
                     # Extract the HTML content
                     html_content = await page.content()
-                    print(f"Successfully extracted HTML using {strategy} strategy")
+                    if debug:
+                        print(f"Successfully extracted HTML using {strategy} strategy")
                     break
                     
                 except Exception as e:
                     last_error = e
-                    print(f"Strategy {strategy} failed: {e}")
+                    if debug:
+                        print(f"Strategy {strategy} failed: {e}")
                     continue
             
             if html_content is None:
-                print(f"All wait strategies failed. Last error: {last_error}")
+                if debug:
+                    print(f"All wait strategies failed. Last error: {last_error}")
                 return None
             
             if output_file:
                 # Save to file
                 with open(output_file, 'w', encoding='utf-8') as f:
                     f.write(html_content)
-                print(f"HTML saved to: {output_file}")
+                if debug:
+                    print(f"HTML saved to: {output_file}")
             else:
-                # Print to console
-                print("\n" + "="*50)
-                print("EXTRACTED HTML:")
-                print("="*50)
-                print(html_content)
+                # Print to console only if debug is enabled
+                if debug:
+                    print("\n" + "="*50)
+                    print("EXTRACTED HTML:")
+                    print("="*50)
+                    print(html_content)
             
             return html_content
             
         except Exception as e:
-            print(f"Error: {e}")
+            if debug:
+                print(f"Error: {e}")
             return None
         finally:
             await browser.close()

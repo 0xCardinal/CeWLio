@@ -264,92 +264,107 @@ class TestCeWLio(unittest.TestCase):
 class TestExtractHTML(unittest.TestCase):
     """Test cases for the extract_html module."""
     
-    @patch('extract_html.async_playwright')
-    async def test_extract_html_success(self, mock_playwright):
+    @patch('cewlio.extractors.async_playwright')
+    def test_extract_html_success(self, mock_playwright):
         """Test successful HTML extraction."""
-        # Mock the playwright context
-        mock_context = AsyncMock()
-        mock_browser = AsyncMock()
-        mock_page = AsyncMock()
+        async def _test():
+            # Mock the playwright context
+            mock_context = AsyncMock()
+            mock_browser = AsyncMock()
+            mock_page = AsyncMock()
+            
+            mock_playwright.return_value.__aenter__.return_value = mock_context
+            mock_context.chromium.launch.return_value = mock_browser
+            mock_browser.new_page.return_value = mock_page
+            mock_page.content.return_value = "<html><body>Test content</body></html>"
+            
+            result = await extract_html("https://example.com")
+            
+            self.assertEqual(result, "<html><body>Test content</body></html>")
+            mock_page.goto.assert_called_once()
+            mock_browser.close.assert_called_once()
         
-        mock_playwright.return_value.__aenter__.return_value = mock_context
-        mock_context.chromium.launch.return_value = mock_browser
-        mock_browser.new_page.return_value = mock_page
-        mock_page.content.return_value = "<html><body>Test content</body></html>"
-        
-        result = await extract_html("https://example.com")
-        
-        self.assertEqual(result, "<html><body>Test content</body></html>")
-        mock_page.goto.assert_called_once()
-        mock_browser.close.assert_called_once()
+        run_async_test(_test)
 
-    @patch('extract_html.async_playwright')
-    async def test_extract_html_with_wait_time(self, mock_playwright):
+    @patch('cewlio.extractors.async_playwright')
+    def test_extract_html_with_wait_time(self, mock_playwright):
         """Test HTML extraction with wait time."""
-        mock_context = AsyncMock()
-        mock_browser = AsyncMock()
-        mock_page = AsyncMock()
+        async def _test():
+            mock_context = AsyncMock()
+            mock_browser = AsyncMock()
+            mock_page = AsyncMock()
+            
+            mock_playwright.return_value.__aenter__.return_value = mock_context
+            mock_context.chromium.launch.return_value = mock_browser
+            mock_browser.new_page.return_value = mock_page
+            mock_page.content.return_value = "<html><body>Test content</body></html>"
+            
+            result = await extract_html("https://example.com", wait_time=2)
+            
+            self.assertEqual(result, "<html><body>Test content</body></html>")
+            # Check that sleep was called (wait_time > 0)
+            # Note: We can't easily test asyncio.sleep in this context
         
-        mock_playwright.return_value.__aenter__.return_value = mock_context
-        mock_context.chromium.launch.return_value = mock_browser
-        mock_browser.new_page.return_value = mock_page
-        mock_page.content.return_value = "<html><body>Test content</body></html>"
-        
-        result = await extract_html("https://example.com", wait_time=2)
-        
-        self.assertEqual(result, "<html><body>Test content</body></html>")
-        # Check that sleep was called (wait_time > 0)
-        # Note: We can't easily test asyncio.sleep in this context
+        run_async_test(_test)
 
-    @patch('extract_html.async_playwright')
-    async def test_extract_html_failure(self, mock_playwright):
+    @patch('cewlio.extractors.async_playwright')
+    def test_extract_html_failure(self, mock_playwright):
         """Test HTML extraction failure."""
-        mock_context = AsyncMock()
-        mock_browser = AsyncMock()
-        mock_page = AsyncMock()
+        async def _test():
+            mock_context = AsyncMock()
+            mock_browser = AsyncMock()
+            mock_page = AsyncMock()
+            
+            mock_playwright.return_value.__aenter__.return_value = mock_context
+            mock_context.chromium.launch.return_value = mock_browser
+            mock_browser.new_page.return_value = mock_page
+            mock_page.goto.side_effect = Exception("Network error")
+            
+            result = await extract_html("https://example.com")
+            
+            self.assertIsNone(result)
+            mock_browser.close.assert_called_once()
         
-        mock_playwright.return_value.__aenter__.return_value = mock_context
-        mock_context.chromium.launch.return_value = mock_browser
-        mock_browser.new_page.return_value = mock_page
-        mock_page.goto.side_effect = Exception("Network error")
-        
-        result = await extract_html("https://example.com")
-        
-        self.assertIsNone(result)
-        mock_browser.close.assert_called_once()
+        run_async_test(_test)
 
 
 class TestProcessURLWithCeWLio(unittest.TestCase):
     """Test cases for the process_url_with_cewlio function."""
     
-    @patch('cewlio.extract_html')
-    async def test_process_url_success(self, mock_extract_html):
+    @patch('cewlio.core.extract_html')
+    def test_process_url_success(self, mock_extract_html):
         """Test successful URL processing."""
-        mock_extract_html.return_value = """
-        <html>
-        <head><meta name="description" content="Test description"></head>
-        <body>Test content with words</body>
-        </html>
-        """
+        async def _test():
+            mock_extract_html.return_value = """
+            <html>
+            <head><meta name="description" content="Test description"></head>
+            <body>Test content with words</body>
+            </html>
+            """
+            
+            cewlio = CeWLio()
+            result = await process_url_with_cewlio("https://example.com", cewlio)
+            
+            self.assertTrue(result)
+            self.assertIn("Test", cewlio.words)
+            self.assertIn("content", cewlio.words)
+            self.assertIn("words", cewlio.words)
+            self.assertIn("Test description", cewlio.metadata)
         
-        cewlio = CeWLio()
-        result = await process_url_with_cewlio("https://example.com", cewlio)
-        
-        self.assertTrue(result)
-        self.assertIn("Test", cewlio.words)
-        self.assertIn("content", cewlio.words)
-        self.assertIn("words", cewlio.words)
-        self.assertIn("Test description", cewlio.metadata)
+        run_async_test(_test)
 
-    @patch('cewlio.extract_html')
-    async def test_process_url_failure(self, mock_extract_html):
+    @patch('cewlio.core.extract_html')
+    def test_process_url_failure(self, mock_extract_html):
         """Test URL processing failure."""
-        mock_extract_html.return_value = None
+        async def _test():
+            mock_extract_html.return_value = None
+            
+            cewlio = CeWLio()
+            result = await process_url_with_cewlio("https://example.com", cewlio)
+            
+            self.assertFalse(result)
         
-        cewlio = CeWLio()
-        result = await process_url_with_cewlio("https://example.com", cewlio)
-        
-        self.assertFalse(result)
+        run_async_test(_test)
 
 
 class TestIntegration(unittest.TestCase):
