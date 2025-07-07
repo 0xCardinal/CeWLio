@@ -9,6 +9,7 @@ import unittest
 import tempfile
 import os
 import asyncio
+import argparse
 from unittest.mock import patch, MagicMock, AsyncMock
 from io import StringIO
 import sys
@@ -462,6 +463,62 @@ class TestIntegration(unittest.TestCase):
         self.assertIn("words", word_content)
 
 
+class TestCLIValidation(unittest.TestCase):
+    """Test CLI argument validation."""
+    
+    def setUp(self):
+        """Set up test fixtures."""
+        from cewlio.cli import validate_positive_int, validate_non_negative_int
+        self.validate_positive_int = validate_positive_int
+        self.validate_non_negative_int = validate_non_negative_int
+    
+    def test_validate_positive_int_valid_values(self):
+        """Test positive integer validation with valid values."""
+        self.assertEqual(self.validate_positive_int("1"), 1)
+        self.assertEqual(self.validate_positive_int("10"), 10)
+        self.assertEqual(self.validate_positive_int("100"), 100)
+    
+    def test_validate_positive_int_invalid_values(self):
+        """Test positive integer validation with invalid values."""
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_positive_int("0")
+        
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_positive_int("-1")
+        
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_positive_int("abc")
+        
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_positive_int("1.5")
+    
+    def test_validate_positive_int_with_allow_zero(self):
+        """Test positive integer validation with allow_zero=True."""
+        self.assertEqual(self.validate_positive_int("0", allow_zero=True), 0)
+        self.assertEqual(self.validate_positive_int("1", allow_zero=True), 1)
+        self.assertEqual(self.validate_positive_int("10", allow_zero=True), 10)
+        
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_positive_int("-1", allow_zero=True)
+    
+    def test_validate_non_negative_int_valid_values(self):
+        """Test non-negative integer validation with valid values."""
+        self.assertEqual(self.validate_non_negative_int("0"), 0)
+        self.assertEqual(self.validate_non_negative_int("1"), 1)
+        self.assertEqual(self.validate_non_negative_int("10"), 10)
+    
+    def test_validate_non_negative_int_invalid_values(self):
+        """Test non-negative integer validation with invalid values."""
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_non_negative_int("-1")
+        
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_non_negative_int("abc")
+        
+        with self.assertRaises(argparse.ArgumentTypeError):
+            self.validate_non_negative_int("1.5")
+
+
 class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions."""
     
@@ -548,6 +605,7 @@ if __name__ == '__main__':
         TestExtractHTML,
         TestProcessURLWithCeWLio,
         TestIntegration,
+        TestCLIValidation,
         TestEdgeCases
     ]
     

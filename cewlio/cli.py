@@ -13,6 +13,27 @@ from importlib.metadata import version, PackageNotFoundError
 from .core import CeWLio, process_url_with_cewlio
 
 
+def validate_positive_int(value: str, allow_zero: bool = False) -> int:
+    """Validate that the value is a positive integer (or non-negative if allow_zero=True)."""
+    try:
+        # Strip quotes if present
+        cleaned_value = value.strip('"\'')
+        int_value = int(cleaned_value)
+        if allow_zero:
+            if int_value < 0:
+                raise argparse.ArgumentTypeError(f"Value must be a non-negative integer, got {int_value}")
+        else:
+            if int_value <= 0:
+                raise argparse.ArgumentTypeError(f"Value must be a positive integer, got {int_value}")
+        return int_value
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Value must be a valid integer, got '{value}'")
+
+
+def validate_non_negative_int(value: str) -> int:
+    """Validate that the value is a non-negative integer (wrapper for validate_positive_int)."""
+    return validate_positive_int(value, allow_zero=True)
+
 def get_version() -> str:
     """Get version from package metadata."""
     try:
@@ -84,14 +105,14 @@ Examples:
     # Word processing options
     parser.add_argument(
         "-m", "--min_word_length",
-        type=int,
+        type=validate_positive_int,
         default=3,
-        help="Minimum word length, default 3"
+        help="Minimum word length (positive integer), default 3"
     )
     parser.add_argument(
         "--max-length",
-        type=int,
-        help="Maximum word length (default: no limit)"
+        type=validate_positive_int,
+        help="Maximum word length (positive integer, default: no limit)"
     )
     parser.add_argument(
         "--lowercase",
@@ -117,17 +138,17 @@ Examples:
     # Word groups
     parser.add_argument(
         "--groups",
-        type=int,
+        type=validate_positive_int,
         metavar="SIZE",
-        help="Generate word groups of specified size"
+        help="Generate word groups of specified size (positive integer)"
     )
     
     # Browser options
     parser.add_argument(
         "-w", "--wait",
-        type=int,
+        type=validate_non_negative_int,
         default=0,
-        help="Wait time in seconds for JavaScript execution (default: 0)"
+        help="Wait time in seconds for JavaScript execution (non-negative integer, default: 0)"
     )
     parser.add_argument(
         "--visible",
@@ -136,9 +157,9 @@ Examples:
     )
     parser.add_argument(
         "--timeout",
-        type=int,
+        type=validate_positive_int,
         default=30000,
-        help="Browser timeout in milliseconds (default: 30000)"
+        help="Browser timeout in milliseconds (positive integer, default: 30000)"
     )
 
     
@@ -156,6 +177,11 @@ def main() -> None:
     """Main CLI entry point."""
     parser = create_parser()
     args = parser.parse_args()
+    
+    # Validate that max_length is greater than min_word_length if both are specified
+    if args.max_length is not None and args.max_length <= args.min_word_length:
+        print(f"Error: Maximum word length ({args.max_length}) must be greater than minimum word length ({args.min_word_length})", file=sys.stderr)
+        sys.exit(1)
     
     # Create CeWLio instance
     cewlio = CeWLio(

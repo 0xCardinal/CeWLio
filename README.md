@@ -78,7 +78,7 @@ cewlio https://example.com -a
 cewlio https://example.com --email_file emails.txt --meta_file meta.txt
 ```
 
-### Advanced Examples
+### More Examples
 
 **Generate word groups with counts:**
 ```bash
@@ -115,16 +115,6 @@ cewlio https://example.com -a
 cewlio https://example.com --email_file emails.txt
 ```
 
-**Show debug information:**
-```bash
-cewlio https://example.com --debug
-```
-
-**Show version:**
-```bash
-cewlio --version
-```
-
 ---
 
 ## 🎛️ Command-Line Options
@@ -148,7 +138,6 @@ cewlio --version
 | `-w, --wait` | Wait time for JavaScript execution (seconds) | 0 |
 | `--visible` | Show browser window | False |
 | `--timeout` | Browser timeout (milliseconds) | 30000 |
-
 | `--debug` | Show debug/summary output | False |
 
 ---

@@ -15,6 +15,7 @@ TEST_CLASSES = {
     "TestExtractHTML": "HTML extraction tests", 
     "TestProcessURLWithCeWLio": "URL processing tests",
     "TestIntegration": "Integration tests",
+    "TestCLIValidation": "CLI argument validation tests",
     "TestEdgeCases": "Edge case tests"
 }
 

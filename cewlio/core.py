@@ -55,24 +55,19 @@ class CeWLio:
         # Remove style tags and their content
         html_content = re.sub(r'<style[^>]*>.*?</style>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
         
-        # Remove HTML tags
+        # Remove HTML tags and all their attributes
         html_content = self.html_tag_pattern.sub(' ', html_content)
         
         # Remove HTML entities
         html_content = self.html_entity_pattern.sub('', html_content)
         
-        # Extract text from common attributes
-        attribute_patterns = [
-            r'alt="([^"]*)"',
-            r'title="([^"]*)"',
-            r'placeholder="([^"]*)"',
-            r'aria-label="([^"]*)"'
-        ]
+        # Remove CSS pseudo-selectors and attribute patterns that might contain words
+        # This catches patterns like before:content-['>'], before:absolute, etc.
+        html_content = re.sub(r'[a-zA-Z-]+:[^;]*;', '', html_content)
+        html_content = re.sub(r'[a-zA-Z-]+:\s*[^;\s]*', '', html_content)
         
-        for pattern in attribute_patterns:
-            matches = re.findall(pattern, html_content, re.IGNORECASE)
-            for match in matches:
-                html_content += f" {match}"
+        # Remove any remaining attribute-like patterns
+        html_content = re.sub(r'\b(aria|href|src|alt|title|class|id|style|data|role|tabindex|type|rel|property|name|content|charset|viewport|crossorigin|fill|stroke|width|height|viewBox|xmlns|d|cx|cy|r|x|y|x1|x2|y1|y2|stroke-width|stroke-linecap|stroke-linejoin|transform|position|top|left|right|bottom|z-index|pointer-events|transition|opacity|background|border|color|font|text|margin|padding|display|flex|grid|space|gap|justify|align|items|center|between|around|wrap|direction|column|row|hidden|visible|fixed|absolute|relative|sticky|backdrop|blur|border|rounded|shadow|hover|focus|disabled|sr-only|lucide|h-|w-|p-|m-|text-|bg-|border-|rounded-|shadow-|hover:|focus:|before:|after:|sm:|md:|lg:|xl:)\b', '', html_content, flags=re.IGNORECASE)
         
         return html_content
 
