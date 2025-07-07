@@ -15,7 +15,6 @@ except ImportError:
     __version__ = "1.1.1"
 
 __author__ = "Kumar Ashwin"
-__email__ = "kumar.ashwin@example.com"
 
 __all__ = [
     "CeWLio",
