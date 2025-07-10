@@ -47,8 +47,8 @@ Thank you for your interest in contributing to CeWLio! This document provides gu
 # Install the package in development mode with dev dependencies
 pip install -e ".[dev]"
 
-# Install Playwright browsers
-playwright install
+# Install Playwright browser (chromium-headless-shell only)
+playwright install chromium-headless-shell
 ```
 
 ### 2. Verify Installation

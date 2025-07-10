@@ -6,6 +6,7 @@ Command-line interface for CeWLio.
 import argparse
 import asyncio
 import sys
+import warnings
 from pathlib import Path
 from typing import Optional
 from importlib.metadata import version, PackageNotFoundError
@@ -175,6 +176,50 @@ Examples:
 
 def main() -> None:
     """Main CLI entry point."""
+    
+    # Check for Playwright availability early
+    try:
+        import playwright
+    except ImportError:
+        print("❌ Playwright is not installed.", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("CeWLio requires Playwright for browser automation.", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("To install:", file=sys.stderr)
+        print("1. pip install playwright", file=sys.stderr)
+        print("2. playwright install chromium-headless-shell", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("For more information, see: https://playwright.dev/python/docs/installation", file=sys.stderr)
+        sys.exit(1)
+    
+    # Check if browser is installed (optional check)
+    try:
+        from playwright.async_api import async_playwright
+        import asyncio
+        
+        async def check_browser():
+            async with async_playwright() as p:
+                try:
+                    browser = await p.chromium.launch(headless=True)
+                    await browser.close()
+                    return True
+                except KeyboardInterrupt:
+                    return False
+                except Exception:
+                    return False
+        
+        # Run a quick browser check
+        if not asyncio.run(check_browser()):
+            print("⚠️  Warning: Chromium browser may not be properly installed.", file=sys.stderr)
+            print("If you encounter browser errors, run: playwright install chromium-headless-shell", file=sys.stderr)
+            print("", file=sys.stderr)
+    except KeyboardInterrupt:
+        print("\n⏹️  Browser check cancelled by user", file=sys.stderr)
+        sys.exit(1)
+    except Exception:
+        # If browser check fails, continue anyway - the actual error will be caught later
+        pass
+    
     parser = create_parser()
     args = parser.parse_args()
     
@@ -220,21 +265,31 @@ def main() -> None:
             sys.exit(1)
     
     try:
-        # Process the URL
-        success = asyncio.run(process_url_with_cewlio(
-            url=args.url,
-            cewlio_instance=cewlio,
-            group_size=args.groups,
-            output_file=output_file,
-            email_file=email_file,
-            metadata_file=metadata_file,
-            show_emails=args.email,
-            show_metadata=args.meta,
-            wait_time=args.wait,
-            headless=not args.visible,
-            timeout=args.timeout,
-            debug=args.debug
-        ))
+        # Process the URL with proper exception handling
+        async def run_with_exception_handling():
+            try:
+                return await process_url_with_cewlio(
+                    url=args.url,
+                    cewlio_instance=cewlio,
+                    group_size=args.groups,
+                    output_file=output_file,
+                    email_file=email_file,
+                    metadata_file=metadata_file,
+                    show_emails=args.email,
+                    show_metadata=args.meta,
+                    wait_time=args.wait,
+                    headless=not args.visible,
+                    timeout=args.timeout,
+                    debug=args.debug
+                )
+            except KeyboardInterrupt:
+                print("\n⏹️  Operation cancelled by user", file=sys.stderr)
+                return False
+            except Exception as e:
+                # Let the outer exception handler deal with it
+                raise
+        
+        success = asyncio.run(run_with_exception_handling())
         
         if not success:
             sys.exit(1)
@@ -251,10 +306,48 @@ def main() -> None:
                 print(f"Metadata items found: {len(cewlio.metadata)}", file=sys.stderr)
     
     except KeyboardInterrupt:
-        print("\nOperation cancelled by user", file=sys.stderr)
+        print("\n⏹️  Operation cancelled by user", file=sys.stderr)
+        sys.exit(1)
+    except ImportError as e:
+        if "playwright" in str(e).lower():
+            print("❌ Playwright is not installed or not available.", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("To fix this issue:", file=sys.stderr)
+            print("1. Install Playwright: pip install playwright", file=sys.stderr)
+            print("2. Install the browser: playwright install chromium-headless-shell", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("For more information, see: https://playwright.dev/python/docs/installation", file=sys.stderr)
+        else:
+            print(f"❌ Import error: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        error_msg = str(e).lower()
+        if "browser" in error_msg and ("not found" in error_msg or "not installed" in error_msg):
+            print("❌ Browser not found. Please install the required browser:", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("playwright install chromium-headless-shell", file=sys.stderr)
+        elif "timeout" in error_msg:
+            print("❌ Browser timeout. The page took too long to load.", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("Try increasing the timeout with --timeout or wait time with -w", file=sys.stderr)
+            print("Example: cewlio https://example.com --timeout 60000 -w 10", file=sys.stderr)
+        elif "network" in error_msg or "connection" in error_msg or "err_aborted" in error_msg:
+            print("❌ Network error. Unable to connect to the website.", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("Please check:", file=sys.stderr)
+            print("- Your internet connection", file=sys.stderr)
+            print("- The URL is correct and accessible", file=sys.stderr)
+            print("- The website is not blocking automated access", file=sys.stderr)
+        elif "playwright" in error_msg:
+            # Handle Playwright-specific errors without showing traceback
+            print("❌ Browser error occurred during page processing.", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("This could be due to:", file=sys.stderr)
+            print("- Website blocking automated access", file=sys.stderr)
+            print("- Network connectivity issues", file=sys.stderr)
+            print("- Browser timeout (try increasing --timeout)", file=sys.stderr)
+        else:
+            print(f"❌ Error: {e}", file=sys.stderr)
         sys.exit(1)
     finally:
         # Close files

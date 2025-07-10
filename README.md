@@ -56,6 +56,11 @@ pip install -e .
 - BeautifulSoup4 (for HTML parsing)
 - Requests (for HTTP handling)
 
+**Note:** After installing Playwright, you only need to install the chromium-headless-shell browser:
+```bash
+playwright install chromium-headless-shell
+```
+
 ---
 
 ## ⚡ Quick Start
@@ -213,7 +218,7 @@ For detailed testing information and development setup, see [CONTRIBUTING.md](CO
 **"No module named 'playwright'"**
 ```bash
 pip install playwright
-playwright install
+playwright install chromium-headless-shell
 ```
 
 **JavaScript-heavy sites not loading properly**

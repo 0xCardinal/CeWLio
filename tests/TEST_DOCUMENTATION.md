@@ -86,9 +86,9 @@ Install test dependencies:
 pip install -r test_requirements.txt
 ```
 
-Install Playwright browsers:
+Install Playwright browser (chromium-headless-shell only):
 ```bash
-playwright install
+playwright install chromium-headless-shell
 ```
 
 ### Running All Tests
@@ -227,7 +227,7 @@ Success rate: 100.0%
    ```
    Error: playwright not found
    ```
-   Solution: Run `playwright install`
+   Solution: Run `playwright install chromium-headless-shell`
 
 2. **Import errors**
    ```

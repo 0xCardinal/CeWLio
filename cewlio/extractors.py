@@ -24,8 +24,25 @@ async def extract_html(url, output_file=None, wait_time=0, headless=True, timeou
     """
     async with async_playwright() as p:
         # Launch browser
-        browser = await p.chromium.launch(headless=headless)
-        page = await browser.new_page()
+        try:
+            browser = await p.chromium.launch(headless=headless)
+            page = await browser.new_page()
+        except KeyboardInterrupt:
+            print("\n⏹️  Browser launch cancelled by user", file=sys.stderr)
+            return None
+        except Exception as e:
+            error_msg = str(e).lower()
+            if "browser" in error_msg and ("not found" in error_msg or "not installed" in error_msg):
+                print("❌ Chromium browser not found. Please install it with:", file=sys.stderr)
+                print("playwright install chromium-headless-shell", file=sys.stderr)
+            elif "executable doesn't exist" in error_msg:
+                print("❌ Chromium browser executable not found. Please install it with:", file=sys.stderr)
+                print("playwright install chromium-headless-shell", file=sys.stderr)
+                print("", file=sys.stderr)
+                print("Note: Use 'chromium-headless-shell' instead of 'playwright install' to save disk space.", file=sys.stderr)
+            else:
+                print(f"❌ Failed to launch browser: {e}", file=sys.stderr)
+            return None
         
         try:
             if debug:
@@ -86,6 +103,10 @@ async def extract_html(url, output_file=None, wait_time=0, headless=True, timeou
             
             return html_content
             
+        except KeyboardInterrupt:
+            if debug:
+                print("\n⏹️  Browser operation cancelled by user", file=sys.stderr)
+            return None
         except Exception as e:
             if debug:
                 print(f"Error: {e}")
@@ -133,6 +154,13 @@ def main():
     ))
     
     if html is None:
+        print("❌ Failed to extract HTML from the webpage.", file=sys.stderr)
+        print("This could be due to:", file=sys.stderr)
+        print("- Network connectivity issues", file=sys.stderr)
+        print("- Website blocking automated access", file=sys.stderr)
+        print("- Invalid or inaccessible URL", file=sys.stderr)
+        print("- Browser timeout (try increasing --timeout or -w)", file=sys.stderr)
+        print("- Operation was cancelled by user (Ctrl+C)", file=sys.stderr)
         sys.exit(1)
 
 

@@ -53,9 +53,9 @@ Install test dependencies:
 pip install -r requirements.txt
 ```
 
-Install Playwright browsers:
+Install Playwright browser (chromium-headless-shell only):
 ```bash
-playwright install
+playwright install chromium-headless-shell
 ```
 
 ### Run All Tests
