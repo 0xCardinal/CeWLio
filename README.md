@@ -2,7 +2,6 @@
 
 [![AI-Assisted Development](https://img.shields.io/badge/AI--Assisted-Development-blue?style=for-the-badge&logo=openai&logoColor=white)](https://github.com/0xCardinal/cewlio)
 [![Python](https://img.shields.io/badge/Python-3.12+-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-GPL%203.0-green?style=for-the-badge)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-Passed-brightgreen?style=for-the-badge)](CONTRIBUTING.md#testing)
 
 **CeWLio** is a powerful, Python-based Custom Word List Generator inspired by the original [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood. While CeWL is excellent for static HTML content, CeWLio brings modern web scraping capabilities to handle today's JavaScript-heavy websites. It crawls web pages, executes JavaScript, and extracts:
