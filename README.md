@@ -259,15 +259,12 @@ For detailed development setup and guidelines, see [CONTRIBUTING.md](CONTRIBUTIN
 ## 🙏 Credits
 
 - Inspired by [CeWL](https://digi.ninja/projects/cewl.php) by Robin Wood
-- Built with [Playwright](https://playwright.dev/) for browser automation
-- Uses [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) for HTML parsing
 
 ---
 
 ## 📞 Support
 
 - 🐛 **Issues:** [GitHub Issues](https://github.com/0xCardinal/cewlio/issues)
-- 📖 **Documentation:** [GitHub Wiki](https://github.com/0xCardinal/cewlio/wiki)
 - 💬 **Discussions:** [GitHub Discussions](https://github.com/0xCardinal/cewlio/discussions)
 
 ---
