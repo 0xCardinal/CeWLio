@@ -12,7 +12,7 @@
 
 Perfect for penetration testers, security researchers, and anyone needing high-quality, site-specific wordlists!
 
-> **🤖 AI-Assisted Development**: This project was created with the help of AI tools, but solves real-world problems in web scraping and word list generation. Every line of code has been carefully reviewed, tested, and optimized for production use.
+> **🤖 AI-Assisted Development**: This project was created with the help of AI tools, but solves real-world problems in web scraping and word list generation.
 
 ---
 
